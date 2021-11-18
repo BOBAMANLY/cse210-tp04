@@ -4,6 +4,7 @@ import random
 from game.casting.actor import Actor
 from game.casting.stone import Stone
 from game.casting.cast import Cast
+from game.casting.score import Score
 
 from game.directing.director import Director
 
@@ -18,7 +19,7 @@ FRAME_RATE = 30
 MAX_X = 900
 MAX_Y = 600
 CELL_SIZE = 15
-FONT_SIZE = 45
+FONT_SIZE = 15
 COLS = 60
 ROWS = 40
 CAPTION = "Greed"
@@ -35,18 +36,18 @@ def main():
     position = Point(x, y)
 
     player = Actor()
-    player.set_text("^")
+    player.set_text("@")
     player.set_font_size(FONT_SIZE)
     player.set_color(WHITE)
     player.set_position(position)
     cast.add_actor("player", player)
     # create intial score
-    score = 0
+    # cast.add_actor("score", Score())
     
     # start the game
     keyboard_service = KeyboardService(CELL_SIZE)
     video_service = VideoService(CAPTION, MAX_X, MAX_Y, CELL_SIZE, FRAME_RATE)
-    director = Director(keyboard_service, video_service, score)
+    director = Director(keyboard_service, video_service)
     director.start_game(cast)
 
 
