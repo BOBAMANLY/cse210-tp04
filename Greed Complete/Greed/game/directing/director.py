@@ -1,3 +1,5 @@
+from game.casting.stone import Stone
+from game.shared.point import Point
 class Director:
     """A person who directs the game. 
     
@@ -17,7 +19,6 @@ class Director:
         """
         self._keyboard_service = keyboard_service
         self._video_service = video_service
-        self.score = score
         
     def start_game(self, cast):
         """Starts the game using the given cast. Runs the main game loop.
@@ -43,7 +44,6 @@ class Director:
         velocity = self._keyboard_service.get_direction()
         player.set_velocity(velocity)        
         # player actor = direction horizontal only
-    
 
     def _do_updates(self, cast):
         """Updates the robot's position and resolves any collisions with artifacts.
@@ -52,25 +52,41 @@ class Director:
             cast (Cast): The cast of actors.
         """
         # create rocks, gems at top of screen (random x, set y)(random number of stones)
-        cast.add_actor("stone", "O")
-        cast.add_actor("gem", "*")
+        gem = Stone()
+        gem.set_text("*")
+        gem.set_points(1)
+        gem.set_velocity(Point(0,15))
+        gem.set_position(Point(750,50))
+
+        rock = Stone()
+        rock.set_text("O")
+        rock.set_points(-1)
+        rock.set_velocity(Point(0,15))
+        rock.set_position(Point(50,50))
+
+        cast.add_actor("stones", gem)
+        cast.add_actor("stones", rock)
+
+        # cast.add_actor("gems", "*")
         # move player, rocks, gems
         max_x = self._video_service.get_width()
         max_y = self._video_service.get_height()
         for actor in cast.get_all_actors():
             actor.move_next(max_x, max_y)
+
         # check for collisions between player and stone or player and gem
         # award points if needed(add points to score, negative for rocks, positive for gems)
         # remove stone or gem if needed
-        if cast.get_first_actor("player").get_position() == cast.get_first_actor("stone").get_position():
-            self.score.add_points(-1)
-            cast.remove_actor("stone", "O")
-        elif cast.get_first_actor("player").get_position() == cast.get_first_actor("gem").get_position():
-            self.score.add_points(1)
-            cast.remove_actor("gem", "*")
-        
 
-        
+        stones = cast.get_actors("stones")
+        player = cast.get_first_actor("player")
+        score = cast.get_first_actor("score")
+
+        for stone in stones:
+            if player.get_position().equals(stone.get_position()):
+                points = stone.get_points()
+                score.add_points(points)
+                cast.remove_actor("stones", stone)
         
     def _do_outputs(self, cast):
         """Draws the actors on the screen.

@@ -1,7 +1,7 @@
 from game.casting.actor import Actor
 
 
-class Stone(Actor):
+class Score(Actor):
     """
     An item of cultural or historical interest. 
     
@@ -12,17 +12,15 @@ class Stone(Actor):
     """
     def __init__(self):
         super().__init__()
-        self._points = 0
-
-    def set_points(self, points):
-        self.points = points
+        self._points = ""
     
-    def get_points(self):
+    def add_points(self, points):
         """Updates the message to the given one.
         
         Args:
             message (string): The given message.
         """
-        return self._points
+        self._points += points
+        self.set_text(f"Score: {self._points}")
 
     
