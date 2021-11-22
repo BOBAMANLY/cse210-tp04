@@ -1,6 +1,7 @@
 from game.casting.stone import Stone
 from game.shared.point import Point
 from game.shared.color import Color
+import random as r
 # from game.casting.cast import Cast
 
 WHITE = Color(255, 255, 255)
@@ -61,39 +62,54 @@ class Director:
         gem = Stone()
         gem.set_text("*")
         gem.set_points(1)
-        gem.set_velocity(Point(0,15))
-        gem.set_position(Point(750,50))
+        gem.set_velocity(Point(0,5))
+        gem.set_position(Point(r.randint(15, 885),15))
         green = Color(0, 255, 0)
         gem.set_color(green)
 
         rock = Stone()
         rock.set_text("o")
         rock.set_points(-1)
-        rock.set_velocity(Point(0,15))
-        rock.set_position(Point(50,50))
+        rock.set_velocity(Point(0,5))
+        rock.set_position(Point(r.randint(15, 885),15))
         blue = Color(0,0,255)
         rock.set_color(blue)
 
         cast.add_actor("stones", gem)
         cast.add_actor("stones", rock)
 
-        # cast.add_actor("gems", "*")
         # move player, rocks, gems
         max_x = self._video_service.get_width()
         max_y = self._video_service.get_height()
         # loop to move all actors
         player = cast.get_first_actor("player")
+        player_x = player.get_position().get_x()
+        player_y = player.get_position().get_y()
+        score = cast.get_first_actor("score")
         for actor in cast.get_actors("stones"):
-            # actor.move_next(max_x, max_y)
+            actor.move_next(max_x, max_y)
             # check for collisions
             if actor.get_text() == "*":
-                if actor.get_position().get_x() == player.get_position().get_x() and actor.get_position().get_y() == player.get_position().get_y():
-                    player.add_points(1)
-                    cast.remove_actor(actor)
-            if actor.get_text() == "o":
-                if actor.get_position().get_x() == player.get_position().get_x() and actor.get_position().get_y() == player.get_position().get_y():
-                    player.set_points(player.get_points() - actor.get_points())
-                    cast.remove_actor(actor)
+                actor_x = actor.get_position().get_x()
+                actor_y = actor.get_position().get_y()
+                if ((player_x - 10 < actor_x < player_x + 10) and (player_y - 10 < actor_y < player_y + 10)):
+                    score.add_points(1)
+                if actor_y > max_y - 30 or((player_x - 10 < actor_x < player_x + 10) and (player_y - 10 < actor_y < player_y + 10)):
+                    cast.remove_actor("stones", actor)
+                    
+            elif actor.get_text() == "o":
+                actor_x = actor.get_position().get_x()
+                actor_y = actor.get_position().get_y()
+                if ((player_x - 10 < actor_x < player_x + 10) and (player_y - 10 < actor_y < player_y + 10)):
+                    score.add_points(-1)
+                if actor_y > max_y - 30 or ((player_x - 10 < actor_x < player_x + 10) and (player_y - 10 < actor_y < player_y + 10)):
+                    cast.remove_actor("stones", actor)
+                    
+                    
+            
+        # move player
+        player.move_next(max_x, max_y)
+
             
         # for actor1 in cast.get_all_actors():
         #     print(actor1.get_position())
@@ -125,10 +141,13 @@ class Director:
         self._video_service.clear_buffer()
         # stones = cast.get_actors("stones")
         player = cast.get_first_actor("player")
+        score = cast.get_first_actor("score")
+        score.set_text(f"SCORE: {score.get_points()}")
         for actor in cast.get_actors("stones"):
             self._video_service.draw_actor(actor)
         # score = cast.get_first_actor("score")
         # self._video_service.draw_actors(stones)
         self._video_service.draw_actor(player)
+        self._video_service.draw_actor(score)
         # self._video_service.draw_actor(score)
         self._video_service.flush_buffer()

@@ -12,8 +12,16 @@ class Score(Actor):
     """
     def __init__(self):
         super().__init__()
-        self._points = ""
-    
+        self._points = 0
+
+    def get_points(self):
+        """Returns the current score.
+        
+        Returns:
+            int: The current score.
+        """
+        return self._points
+
     def add_points(self, points):
         """Updates the message to the given one.
         
